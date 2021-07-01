@@ -4,20 +4,17 @@ import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
+import javafx.scene.input.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-
 import java.io.File;
 import java.nio.file.Paths;
 
@@ -36,22 +33,30 @@ public class Scene2Controller {
     @FXML private Button replayButton;
     @FXML private Button muteButton;
     @FXML private Button unmuteButton;
+    @FXML private Button loadFile;
+    @FXML private Button forward10;
+    @FXML private Button backward10;
+    @FXML private Slider volumeSlider;
+    @FXML private Label volumeValue;
     class ReplayThread extends Thread{
         @Override
         public void run() {
             while (true){
-                if (player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
+                if (player.getMedia() != null && player != null &&
+                        player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
                     player.setStartTime(new Duration(0));
                     break;
                 }
+                else if(player.getMedia() == null)
+                    break;
             }
         }
     }
     private ReplayThread replayThread;
     public void initialize(){
-        replayThread = new ReplayThread();
         replayKey = false;
         muteKey = false;
+        //volumeSlider = new Slider();
         playButton.setVisible(true);
         playButton.setDisable(false);
         pauseButton.setVisible(false);
@@ -60,34 +65,6 @@ public class Scene2Controller {
         muteButton.setDisable(true);
     }
     @FXML public void play(ActionEvent event){
-        /*if (!flag){
-            FileChooser chooser = new FileChooser();
-            file = chooser.showOpenDialog(null);
-            fileName.setText(file.getName());
-            class Temp extends Thread {
-                @Override
-                public void run() {
-                    Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
-                    player = new MediaPlayer(media);
-                    mediaView.setMediaPlayer(player);
-                    player.play();
-                }
-            }
-            new Temp().start();
-            playButton.setVisible(false);
-            playButton.setDisable(true);
-            pauseButton.setVisible(true);
-            pauseButton.setDisable(false);
-            flag = true;
-        }
-        else {
-            player.setStartTime(duration);
-            player.play();
-            playButton.setVisible(false);
-            playButton.setDisable(true);
-            pauseButton.setVisible(true);
-            pauseButton.setDisable(false);
-        }*/
         player.setStartTime(duration);
         player.play();
         playButton.setVisible(false);
@@ -108,6 +85,7 @@ public class Scene2Controller {
             replayButton.setStyle("-fx-background-color: #6d1414; -fx-background-radius: 18");
             player.setCycleCount(Timeline.INDEFINITE);
             replayKey = true;
+            replayThread = new ReplayThread();
             replayThread.start();
         }
         else{
@@ -136,8 +114,8 @@ public class Scene2Controller {
             muteButton.setDisable(true);
         }
     }
-    @FXML public void loadFile(ActionEvent event){
-        if (replayThread.isAlive())
+    @FXML public void loadFileClick(){
+        if (replayThread != null)
             replayThread.interrupt();
         FileChooser chooser = new FileChooser();
         file = chooser.showOpenDialog(null);
@@ -150,6 +128,74 @@ public class Scene2Controller {
         playButton.setDisable(true);
         pauseButton.setVisible(true);
         pauseButton.setDisable(false);
+        if (replayKey){
+            player.setCycleCount(Timeline.INDEFINITE);
+            replayThread = new ReplayThread();
+            replayThread.start();
+        }
 
+    }
+    @FXML public void loadFileKeyBoard(KeyEvent event){
+        KeyCodeCombination keyCodeCombination = new KeyCodeCombination(KeyCode.F,
+                KeyCombination.ALT_ANY,
+                KeyCombination.CONTROL_ANY);
+        if (keyCodeCombination.match(event)){
+            FileChooser chooser = new FileChooser();
+            file = chooser.showOpenDialog(null);
+            fileName.setText(file.getName());
+            Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
+            if (replayThread != null) {
+                replayThread.interrupt();
+                player.stop();
+            }
+            player = new MediaPlayer(media);
+            mediaView.setMediaPlayer(player);
+            player.play();
+            playButton.setVisible(false);
+            playButton.setDisable(true);
+            pauseButton.setVisible(true);
+            pauseButton.setDisable(false);
+            if (replayKey){
+                player.setCycleCount(Timeline.INDEFINITE);
+                replayThread = new ReplayThread();
+                replayThread.start();
+            }
+        }
+    }
+    @FXML public void for10(ActionEvent event){
+        player.seek(Duration.seconds(player.getCurrentTime().toSeconds() + Duration.seconds(10).toSeconds()));
+    }
+    @FXML public void for10KeyBoard(KeyEvent event){
+        if (event.getCode() == KeyCode.RIGHT)
+            player.seek(Duration.seconds(player.getCurrentTime().toSeconds() + Duration.seconds(10).toSeconds()));
+    }
+    @FXML public void back10(ActionEvent event){
+        player.seek(Duration.seconds(player.getCurrentTime().toSeconds() + Duration.seconds(-10).toSeconds()));
+    }
+    @FXML public void back10KeyBoard(KeyEvent event){
+        if (event.getCode() == KeyCode.LEFT)
+            player.seek(Duration.seconds(player.getCurrentTime().toSeconds() + Duration.seconds(-10).toSeconds()));
+
+    }
+    @FXML public void VolumeEqualizer(){
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                player.setVolume(t1.doubleValue());
+                volumeValue.setText(String.valueOf(t1.intValue()));
+                if (t1.floatValue() == 0){
+                    unmuteButton.setDisable(true);
+                    unmuteButton.setVisible(false);
+                    muteButton.setVisible(true);
+                    muteButton.setDisable(false);
+                }
+                else{
+                    unmuteButton.setDisable(false);
+                    unmuteButton.setVisible(true);
+                    muteButton.setVisible(false);
+                    muteButton.setDisable(true);
+                }
+            }
+        });
     }
 }
