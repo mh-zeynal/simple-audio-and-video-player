@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <Button layoutX="274.0" layoutY="188.0" mnemonicParsing="false" onAction="#play" text="play" />
+      <Button layoutX="269.0" layoutY="235.0" mnemonicParsing="false" onAction="#pause" text="pause" />
+      <Button layoutX="265.0" layoutY="281.0" mnemonicParsing="false" onAction="#resume" text="resume" />
+      <Slider fx:id="slider" layoutX="99.0" layoutY="165.0" max="200.0" onDragDetected="#volume" orientation="VERTICAL" value="1.0" />
+   </children>
+</AnchorPane>
