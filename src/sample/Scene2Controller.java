@@ -47,7 +47,7 @@ public class Scene2Controller {
         muteButton.setDisable(true);
     }
     @FXML public void play(ActionEvent event){
-        if (!flag){
+        /*if (!flag){
             FileChooser chooser = new FileChooser();
             file = chooser.showOpenDialog(null);
             fileName.setText(file.getName());
@@ -74,7 +74,13 @@ public class Scene2Controller {
             playButton.setDisable(true);
             pauseButton.setVisible(true);
             pauseButton.setDisable(false);
-        }
+        }*/
+        player.setStartTime(duration);
+        player.play();
+        playButton.setVisible(false);
+        playButton.setDisable(true);
+        pauseButton.setVisible(true);
+        pauseButton.setDisable(false);
     }
     @FXML public void pause(ActionEvent event){
         duration = player.getCurrentTime();
@@ -120,8 +126,7 @@ public class Scene2Controller {
             muteButton.setVisible(true);
             muteButton.setDisable(false);
         }
-        else
-        {
+        else {
             player.setVolume(currentVolume);
             muteKey = false;
             unmuteButton.setDisable(false);
@@ -129,5 +134,25 @@ public class Scene2Controller {
             muteButton.setVisible(false);
             muteButton.setDisable(true);
         }
+    }
+    @FXML public void loadFile(ActionEvent event){
+        FileChooser chooser = new FileChooser();
+        file = chooser.showOpenDialog(null);
+        fileName.setText(file.getName());
+        class Temp extends Thread {
+            @Override
+            public void run() {
+                Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
+                player = new MediaPlayer(media);
+                mediaView.setMediaPlayer(player);
+                player.play();
+            }
+        }
+        new Temp().start();
+        playButton.setVisible(false);
+        playButton.setDisable(true);
+        pauseButton.setVisible(true);
+        pauseButton.setDisable(false);
+
     }
 }
