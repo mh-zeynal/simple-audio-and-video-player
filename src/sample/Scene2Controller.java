@@ -67,7 +67,7 @@ public class Scene2Controller {
             pauseButton.setDisable(false);
             flag = true;
         }
-        else{
+        else {
             player.setStartTime(duration);
             player.play();
             playButton.setVisible(false);
@@ -85,14 +85,28 @@ public class Scene2Controller {
         playButton.setDisable(false);
     }
     @FXML public void setReplay(ActionEvent event){
+        class ReplayThread extends Thread{
+            @Override
+            public void run() {
+                while (true){
+                    if (player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
+                        player.setStartTime(new Duration(0));
+                        break;
+                    }
+                }
+            }
+        }
+        ReplayThread replayThread = new ReplayThread();
         if (!replayKey){
             replayButton.setStyle("-fx-background-color: #6d1414; -fx-background-radius: 18");
             player.setCycleCount(Timeline.INDEFINITE);
             replayKey = true;
+            replayThread.start();
         }
         else{
             replayButton.setStyle("-fx-background-color: #0C1F84FF; -fx-background-radius: 18");
             player.setCycleCount(0);
+            replayThread.interrupt();
             replayKey = false;
         }
     }

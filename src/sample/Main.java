@@ -15,6 +15,7 @@ public class Main extends Application {
         primaryStage.setTitle("protoPlayer");
         primaryStage.setScene(new Scene(root, 600, 431));
         primaryStage.getIcons().add(new Image("pp_00000.png"));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
