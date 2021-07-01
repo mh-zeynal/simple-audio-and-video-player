@@ -25,7 +25,7 @@
                <effect>
                   <InnerShadow>
                      <color>
-                        <Color red="0.9176470637321472" blue="1.0" />
+                        <Color red="0.0470588244497776" green="0.12156862765550613" blue="0.5176470875740051" />
                      </color>
                   </InnerShadow>
                </effect>
@@ -48,7 +48,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="replayButton" layoutX="34.0" layoutY="37.0" mnemonicParsing="false" onAction="#setReplay" style="-fx-background-color: purple; -fx-background-radius: 18;">
+                  <Button fx:id="replayButton" layoutX="34.0" layoutY="37.0" mnemonicParsing="false" onAction="#setReplay" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                      <graphic>
                         <ImageView fitHeight="26.0" fitWidth="52.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -57,7 +57,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="muteButton" layoutX="526.0" layoutY="40.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: purple; -fx-background-radius: 18;">
+                  <Button fx:id="muteButton" layoutX="526.0" layoutY="40.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                      <graphic>
                         <ImageView fitHeight="41.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -66,7 +66,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="unmuteButton" layoutX="526.0" layoutY="40.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: purple; -fx-background-radius: 18;">
+                  <Button fx:id="unmuteButton" layoutX="526.0" layoutY="40.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                      <graphic>
                         <ImageView fitHeight="41.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>

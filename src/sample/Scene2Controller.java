@@ -91,7 +91,7 @@ public class Scene2Controller {
             replayKey = true;
         }
         else{
-            replayButton.setStyle("-fx-background-color: purple; -fx-background-radius: 18");
+            replayButton.setStyle("-fx-background-color: #0C1F84FF; -fx-background-radius: 18");
             player.setCycleCount(0);
             replayKey = false;
         }
