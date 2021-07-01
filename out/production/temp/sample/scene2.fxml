@@ -31,7 +31,7 @@
                   </InnerShadow>
                </effect>
                <children>
-                  <FlowPane hgap="30.0" layoutY="38.0" prefHeight="51.0" prefWidth="600.0">
+                  <FlowPane hgap="30.0" layoutX="9.0" layoutY="38.0" prefHeight="51.0" prefWidth="591.0">
                      <children>
                         <Button fx:id="replayButton" mnemonicParsing="false" onAction="#setReplay" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                            <graphic>

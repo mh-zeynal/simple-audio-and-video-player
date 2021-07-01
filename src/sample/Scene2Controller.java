@@ -36,7 +36,20 @@ public class Scene2Controller {
     @FXML private Button replayButton;
     @FXML private Button muteButton;
     @FXML private Button unmuteButton;
+    class ReplayThread extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                if (player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
+                    player.setStartTime(new Duration(0));
+                    break;
+                }
+            }
+        }
+    }
+    private ReplayThread replayThread;
     public void initialize(){
+        replayThread = new ReplayThread();
         replayKey = false;
         muteKey = false;
         playButton.setVisible(true);
@@ -91,18 +104,6 @@ public class Scene2Controller {
         playButton.setDisable(false);
     }
     @FXML public void setReplay(ActionEvent event){
-        class ReplayThread extends Thread{
-            @Override
-            public void run() {
-                while (true){
-                    if (player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
-                        player.setStartTime(new Duration(0));
-                        break;
-                    }
-                }
-            }
-        }
-        ReplayThread replayThread = new ReplayThread();
         if (!replayKey){
             replayButton.setStyle("-fx-background-color: #6d1414; -fx-background-radius: 18");
             player.setCycleCount(Timeline.INDEFINITE);
@@ -136,19 +137,15 @@ public class Scene2Controller {
         }
     }
     @FXML public void loadFile(ActionEvent event){
+        if (replayThread.isAlive())
+            replayThread.interrupt();
         FileChooser chooser = new FileChooser();
         file = chooser.showOpenDialog(null);
         fileName.setText(file.getName());
-        class Temp extends Thread {
-            @Override
-            public void run() {
-                Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
-                player = new MediaPlayer(media);
-                mediaView.setMediaPlayer(player);
-                player.play();
-            }
-        }
-        new Temp().start();
+        Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
+        player = new MediaPlayer(media);
+        mediaView.setMediaPlayer(player);
+        player.play();
         playButton.setVisible(false);
         playButton.setDisable(true);
         pauseButton.setVisible(true);
