@@ -1,6 +1,8 @@
 package sample;
 
 import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -25,6 +27,8 @@ public class Scene2Controller {
     private boolean replayKey;
     private boolean muteKey;
     private double currentVolume;
+    private double wholeDuration;
+    private Media media;
     @FXML private MediaView mediaView;
     @FXML private MediaPlayer player;
     @FXML private Button playButton;
@@ -38,14 +42,18 @@ public class Scene2Controller {
     @FXML private Button backward10;
     @FXML private Slider volumeSlider;
     @FXML private Label volumeValue;
+    @FXML private Slider progressSlider;
+    @FXML private Label currentTime;
+    @FXML private Label mediaWholeTime;
     class ReplayThread extends Thread{
         @Override
         public void run() {
             while (true){
-                if (player.getMedia() != null && player != null &&
-                        player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
-                    player.setStartTime(new Duration(0));
-                    break;
+                if (player.getMedia() != null && player != null){
+                    if (player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
+                        player.setStartTime(new Duration(0));
+                        break;
+                    }
                 }
                 else if(player.getMedia() == null)
                     break;
@@ -56,13 +64,43 @@ public class Scene2Controller {
     public void initialize(){
         replayKey = false;
         muteKey = false;
-        //volumeSlider = new Slider();
         playButton.setVisible(true);
         playButton.setDisable(false);
         pauseButton.setVisible(false);
         pauseButton.setDisable(true);
         muteButton.setVisible(false);
         muteButton.setDisable(true);
+        volumeSlider.setValue(0.5);
+    }
+    public String getTime(int temp){
+        int hour = 0;
+        int minute = 0;
+        int seconds = 0;
+        if ((temp / 60) == 0){
+            seconds = temp;
+            return "" + getClearFormat(hour) + ":" + getClearFormat(minute) + ":" + getClearFormat(seconds);
+        }
+        else if ((int)(temp / 3600) == 0 && (temp / 60) > 0){
+            minute = temp / 60;
+            temp = temp % 60;
+            seconds = temp;
+            return "" + getClearFormat(hour) + ":" + getClearFormat(minute) + ":" + getClearFormat(seconds);
+        }
+        else if((temp / 3600) > 0){
+            hour = temp / 3600;
+            temp = temp % 3600;
+            minute = temp / 60;
+            temp = temp % 60;
+            seconds = temp;
+            return "" + getClearFormat(hour) + ":" + getClearFormat(minute) + ":" + getClearFormat(seconds);
+        }
+        return null;
+    }
+    private String getClearFormat(int x){
+        if (x < 10){
+            return "0" + x;
+        }
+        return "" + x;
     }
     @FXML public void play(ActionEvent event){
         player.setStartTime(duration);
@@ -115,14 +153,34 @@ public class Scene2Controller {
         }
     }
     @FXML public void loadFileClick(){
-        if (replayThread != null)
-            replayThread.interrupt();
         FileChooser chooser = new FileChooser();
         file = chooser.showOpenDialog(null);
         fileName.setText(file.getName());
-        Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
+        media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
+        if (replayThread != null) {
+            replayThread.interrupt();
+            player.stop();
+        }
         player = new MediaPlayer(media);
         mediaView.setMediaPlayer(player);
+        player.setOnReady(new Runnable() {
+            @Override
+            public void run() {
+                progressSlider.setMin(0);
+                progressSlider.setMax(media.getDuration().toSeconds());
+                progressSlider.setValue(0);
+                progressSlider.setBlockIncrement(1);
+                player.setVolume(0.5);
+                mediaWholeTime.setText(getTime((int) media.getDuration().toSeconds()));
+                player.currentTimeProperty().addListener(new InvalidationListener() {
+                    @Override
+                    public void invalidated(Observable observable) {
+                        progressSlider.setValue(player.getCurrentTime().toSeconds());
+                        currentTime.setText(getTime((int) player.getCurrentTime().toSeconds()));
+                    }
+                });
+            }
+        });
         player.play();
         playButton.setVisible(false);
         playButton.setDisable(true);
@@ -133,7 +191,6 @@ public class Scene2Controller {
             replayThread = new ReplayThread();
             replayThread.start();
         }
-
     }
     @FXML public void loadFileKeyBoard(KeyEvent event){
         KeyCodeCombination keyCodeCombination = new KeyCodeCombination(KeyCode.F,
@@ -143,13 +200,33 @@ public class Scene2Controller {
             FileChooser chooser = new FileChooser();
             file = chooser.showOpenDialog(null);
             fileName.setText(file.getName());
-            Media media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
+            media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
             if (replayThread != null) {
                 replayThread.interrupt();
                 player.stop();
             }
             player = new MediaPlayer(media);
             mediaView.setMediaPlayer(player);
+            player.setOnReady(new Runnable() {
+                @Override
+                public void run() {
+                    progressSlider.setMin(0);
+                    progressSlider.setMax(media.getDuration().toSeconds());
+                    progressSlider.setValue(0);
+                    progressSlider.setBlockIncrement(1);
+                    player.setVolume(0.5);
+                    String temp = getTime((int) media.getDuration().toSeconds());
+                    mediaWholeTime.setText(temp);
+                    System.out.println(temp);
+                    player.currentTimeProperty().addListener(new InvalidationListener() {
+                        @Override
+                        public void invalidated(Observable observable) {
+                            progressSlider.setValue(player.getCurrentTime().toSeconds());
+                            currentTime.setText(getTime((int) player.getCurrentTime().toSeconds()));
+                        }
+                    });
+                }
+            });
             player.play();
             playButton.setVisible(false);
             playButton.setDisable(true);
@@ -182,7 +259,7 @@ public class Scene2Controller {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 player.setVolume(t1.doubleValue());
-                volumeValue.setText(String.valueOf(t1.intValue()));
+                volumeValue.setText(String.valueOf((int)(t1.floatValue() * 100)));
                 if (t1.floatValue() == 0){
                     unmuteButton.setDisable(true);
                     unmuteButton.setVisible(false);
@@ -194,6 +271,18 @@ public class Scene2Controller {
                     unmuteButton.setVisible(true);
                     muteButton.setVisible(false);
                     muteButton.setDisable(true);
+                }
+            }
+        });
+    }
+    @FXML public void setProgress(){
+        progressSlider.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (progressSlider.isValueChanging()) {
+                    player.setStartTime(new Duration(progressSlider.getValue()));
+                    player.play();
+                    System.out.println(progressSlider.getValue());
                 }
             }
         });

@@ -32,7 +32,7 @@
                   </InnerShadow>
                </effect>
                <children>
-                  <FlowPane hgap="30.0" layoutX="9.0" layoutY="38.0" prefHeight="51.0" prefWidth="137.0">
+                  <FlowPane hgap="30.0" layoutX="8.0" layoutY="47.0" prefHeight="51.0" prefWidth="137.0">
                      <children>
                         <Button fx:id="replayButton" mnemonicParsing="false" onAction="#setReplay" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                            <graphic>
@@ -72,7 +72,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="muteButton" layoutX="526.0" layoutY="40.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
+                  <Button fx:id="muteButton" layoutX="525.0" layoutY="49.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                      <graphic>
                         <ImageView fitHeight="41.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -81,7 +81,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button fx:id="unmuteButton" layoutX="526.0" layoutY="40.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
+                  <Button fx:id="unmuteButton" layoutX="525.0" layoutY="49.0" mnemonicParsing="false" onAction="#setMute" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                      <graphic>
                         <ImageView fitHeight="41.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -108,8 +108,11 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Slider fx:id="volumeSlider" blockIncrement="5.0" layoutX="496.0" layoutY="29.0" onDragDetected="#VolumeEqualizer" orientation="VERTICAL" prefHeight="67.0" prefWidth="14.0" style="-fx-background-color: #0C1F84FF;" value="1.0" />
-                  <Label fx:id="volumeValue" layoutX="475.0" layoutY="64.0" text="1" textFill="WHITE" />
+                  <Slider fx:id="volumeSlider" blockIncrement="0.01" layoutX="496.0" layoutY="29.0" max="1.0" onDragDetected="#VolumeEqualizer" orientation="VERTICAL" prefHeight="67.0" prefWidth="14.0" style="-fx-background-color: transparent;" value="0.5" />
+                  <Label fx:id="volumeValue" layoutX="475.0" layoutY="64.0" text="50" textFill="WHITE" />
+                  <Slider fx:id="progressSlider" layoutY="7.0" onMouseClicked="#setProgress" prefHeight="14.0" prefWidth="600.0" />
+                  <Label fx:id="currentTime" layoutX="14.0" layoutY="26.0" text="00:00:00" textFill="WHITE" />
+                  <Label fx:id="mediaWholeTime" layoutX="543.0" layoutY="26.0" text="00:00:00" textFill="WHITE" />
                </children>
             </Pane>
          </bottom>
