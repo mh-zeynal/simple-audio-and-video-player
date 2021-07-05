@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,6 +35,8 @@ public class Scene2Controller {
     private double currentVolume;
     private double wholeDuration;
     private Media media;
+    private int mediaDuration;
+    private boolean playKey;
     @FXML private MediaView mediaView;
     @FXML private MediaPlayer player;
     @FXML private Button playButton;
@@ -53,8 +56,10 @@ public class Scene2Controller {
     @FXML private Pane pane;
     @FXML private Pane buttonsPane;
     @FXML private BorderPane borderPane;
-    @FXML private ImageView for10;
+    @FXML private MenuItem darkTheme, lightTheme, playVideo, openFile, volumeUp, volumeDown, replay;
+    @FXML private MenuItem goForward10, goBackward10, muteVideo;
     public void initialize(){
+        playKey = false;
         replayKey = false;
         muteKey = false;
         playButton.setVisible(true);
@@ -64,6 +69,22 @@ public class Scene2Controller {
         muteButton.setVisible(false);
         muteButton.setDisable(true);
         volumeSlider.setValue(0.5);
+        darkTheme.setAccelerator(new KeyCodeCombination(KeyCode.D,
+                KeyCombination.CONTROL_DOWN,
+                KeyCombination.ALT_DOWN));
+        lightTheme.setAccelerator(new KeyCodeCombination(KeyCode.L,
+                KeyCombination.CONTROL_DOWN,
+                KeyCombination.ALT_DOWN));
+        playVideo.setAccelerator(new KeyCodeCombination(KeyCode.SPACE, KeyCombination.CONTROL_DOWN));
+        openFile.setAccelerator(new KeyCodeCombination(KeyCode.F,
+                KeyCombination.CONTROL_DOWN,
+                KeyCombination.SHIFT_DOWN));
+        volumeUp.setAccelerator(new KeyCodeCombination(KeyCode.UP));
+        volumeDown.setAccelerator(new KeyCodeCombination(KeyCode.DOWN));
+        replay.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
+        goForward10.setAccelerator(new KeyCodeCombination(KeyCode.RIGHT));
+        goBackward10.setAccelerator(new KeyCodeCombination(KeyCode.LEFT));
+        muteVideo.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.CONTROL_DOWN));
     }
     public String getTime(int temp){
         int hour = 0;
@@ -159,6 +180,7 @@ public class Scene2Controller {
                 progressSlider.setValue(0);
                 progressSlider.setBlockIncrement(1);
                 player.setVolume(0.5);
+                mediaDuration = (int) progressSlider.getMax();
                 mediaWholeTime.setText(getTime((int) media.getDuration().toSeconds()));
                 player.currentTimeProperty().addListener(new InvalidationListener() {
                     @Override
@@ -176,47 +198,6 @@ public class Scene2Controller {
         pauseButton.setDisable(false);
         if (replayKey)
             player.setCycleCount(Timeline.INDEFINITE);
-    }
-    @FXML public void loadFileKeyBoard(KeyEvent event){
-        KeyCodeCombination keyCodeCombination = new KeyCodeCombination(KeyCode.F,
-                KeyCombination.ALT_ANY,
-                KeyCombination.CONTROL_ANY);
-        if (keyCodeCombination.match(event)){
-            FileChooser chooser = new FileChooser();
-            file = chooser.showOpenDialog(null);
-            fileName.setText(file.getName());
-            media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
-            if (replayKey)
-                player.stop();
-            player = new MediaPlayer(media);
-            mediaView.setMediaPlayer(player);
-            player.setOnReady(new Runnable() {
-                @Override
-                public void run() {
-                    progressSlider.setMin(0);
-                    progressSlider.setMax(media.getDuration().toSeconds());
-                    progressSlider.setValue(0);
-                    progressSlider.setBlockIncrement(1);
-                    player.setVolume(0.5);
-                    mediaWholeTime.setText(getTime((int) media.getDuration().toSeconds()));
-                    player.currentTimeProperty().addListener(new InvalidationListener() {
-                        @Override
-                        public void invalidated(Observable observable) {
-                            progressSlider.setValue(player.getCurrentTime().toSeconds());
-                            currentTime.setText(getTime((int) player.getCurrentTime().toSeconds()));
-                        }
-                    });
-
-                }
-            });
-            player.play();
-            playButton.setVisible(false);
-            playButton.setDisable(true);
-            pauseButton.setVisible(true);
-            pauseButton.setDisable(false);
-            if (replayKey)
-                player.setCycleCount(Timeline.INDEFINITE);
-        }
     }
     @FXML public void for10(ActionEvent event){
         player.seek(Duration.seconds(player.getCurrentTime().toSeconds() + Duration.seconds(10).toSeconds()));
@@ -270,12 +251,48 @@ public class Scene2Controller {
         buttonsPane.setStyle("-fx-background-color: white");
         volumeValue.setTextFill(Color.BLACK);
     }
-    @FXML public void setProgress(){
-        progressSlider.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                player.seek(new Duration(progressSlider.getValue()));
-            }
-        });
+    @FXML public void playingOption(ActionEvent event){
+        if (!playKey) {
+            pause(event);
+            playKey = true;
+        }
+        else{
+            play(event);
+            playKey = false;
+        }
+    }
+    @FXML public void volumeIncrease(ActionEvent event){
+        volumeSlider.setValue(volumeSlider.getValue() + 0.01);
+        volumeValue.setText(String.valueOf((int)(volumeSlider.getValue() * 100)));
+        player.setVolume(volumeSlider.getValue());
+        if (volumeSlider.getValue() == 0){
+            unmuteButton.setDisable(true);
+            unmuteButton.setVisible(false);
+            muteButton.setVisible(true);
+            muteButton.setDisable(false);
+        }
+        else{
+            unmuteButton.setDisable(false);
+            unmuteButton.setVisible(true);
+            muteButton.setVisible(false);
+            muteButton.setDisable(true);
+        }
+    }
+    @FXML public void volumeDecrease(ActionEvent event){
+        volumeSlider.setValue(volumeSlider.getValue() - 0.01);
+        volumeValue.setText(String.valueOf((int)(volumeSlider.getValue() * 100)));
+        player.setVolume(volumeSlider.getValue());
+        if (volumeSlider.getValue() == 0){
+            unmuteButton.setDisable(true);
+            unmuteButton.setVisible(false);
+            muteButton.setVisible(true);
+            muteButton.setDisable(false);
+        }
+        else{
+            unmuteButton.setDisable(false);
+            unmuteButton.setVisible(true);
+            muteButton.setVisible(false);
+            muteButton.setDisable(true);
+        }
     }
 }

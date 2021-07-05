@@ -46,7 +46,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="loadFile" mnemonicParsing="false" onAction="#loadFileClick" onKeyPressed="#loadFileKeyBoard" onMouseClicked="#loadFileClick" prefHeight="31.0" prefWidth="40.0" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
+                        <Button fx:id="loadFile" mnemonicParsing="false" onAction="#loadFileClick" onMouseClicked="#loadFileClick" prefHeight="31.0" prefWidth="40.0" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                            <graphic>
                               <ImageView fitHeight="37.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -113,7 +113,7 @@
                   </Button>
                   <Slider fx:id="volumeSlider" blockIncrement="0.01" layoutX="496.0" layoutY="29.0" max="1.0" onDragDetected="#VolumeEqualizer" orientation="VERTICAL" prefHeight="67.0" prefWidth="14.0" style="-fx-background-color: transparent;" value="0.5" />
                   <Label fx:id="volumeValue" layoutX="475.0" layoutY="64.0" text="50" textFill="WHITE" />
-                  <Slider fx:id="progressSlider" layoutY="7.0" onMouseClicked="#setProgress" prefHeight="14.0" prefWidth="600.0" />
+                  <Slider fx:id="progressSlider" layoutY="7.0" prefHeight="14.0" prefWidth="600.0" />
                   <Label fx:id="currentTime" layoutX="14.0" layoutY="26.0" text="00:00:00" textFill="WHITE" />
                   <Label fx:id="mediaWholeTime" layoutX="543.0" layoutY="26.0" text="00:00:00" textFill="WHITE" />
                </children>
@@ -151,10 +151,22 @@
         <menus>
           <Menu mnemonicParsing="false" text="theme">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#goDark" text="dark" />
-                  <MenuItem mnemonicParsing="false" onAction="#goLight" text="light" />
+              <MenuItem fx:id="darkTheme" mnemonicParsing="false" onAction="#goDark" text="dark" />
+                  <MenuItem fx:id="lightTheme" mnemonicParsing="false" onAction="#goLight" text="light" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="playing options">
+              <items>
+                <MenuItem fx:id="playVideo" mnemonicParsing="false" onAction="#playingOption" text="play" />
+                  <MenuItem fx:id="openFile" mnemonicParsing="false" onAction="#loadFileClick" text="open file" />
+                  <MenuItem fx:id="volumeUp" mnemonicParsing="false" onAction="#volumeIncrease" text="volume up" />
+                  <MenuItem fx:id="volumeDown" mnemonicParsing="false" onAction="#volumeDecrease" text="volume down" />
+                  <MenuItem fx:id="replay" mnemonicParsing="false" onAction="#setReplay" text="replay" />
+                  <MenuItem fx:id="goForward10" mnemonicParsing="false" onAction="#for10" text="10 sec forward" />
+                  <MenuItem fx:id="goBackward10" mnemonicParsing="false" onAction="#back10" text="10 sec backward" />
+                  <MenuItem fx:id="muteVideo" mnemonicParsing="false" onAction="#setMute" text="Unspecified Action" />
+              </items>
+            </Menu>
         </menus>
       </MenuBar>
    </children>
