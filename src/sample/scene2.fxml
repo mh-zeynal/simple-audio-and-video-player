@@ -2,6 +2,9 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.image.Image?>
@@ -16,14 +19,14 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="431.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Scene2Controller">
+<AnchorPane prefHeight="458.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Scene2Controller">
    <children>
-      <BorderPane prefHeight="431.0" prefWidth="600.0" style="-fx-background-color: #383636;">
+      <BorderPane fx:id="borderPane" layoutY="27.0" prefHeight="431.0" prefWidth="600.0" style="-fx-background-color: #383636;">
          <center>
             <MediaView fx:id="mediaView" fitHeight="311.0" fitWidth="600.0" BorderPane.alignment="CENTER" />
          </center>
          <bottom>
-            <Pane prefHeight="100.0" prefWidth="600.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
+            <Pane fx:id="buttonsPane" prefHeight="100.0" prefWidth="600.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
                <effect>
                   <InnerShadow>
                      <color>
@@ -101,7 +104,7 @@
                   </Button>
                   <Button fx:id="forward10" layoutX="332.0" layoutY="48.0" mnemonicParsing="false" onAction="#for10" onKeyPressed="#for10KeyBoard" style="-fx-background-color: #0C1F84FF; -fx-background-radius: 18;">
                      <graphic>
-                        <ImageView fitHeight="41.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="for10" fitHeight="41.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../10f_00000.png" />
                            </image>
@@ -117,7 +120,7 @@
             </Pane>
          </bottom>
          <top>
-            <Pane prefHeight="20.0" prefWidth="600.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
+            <Pane fx:id="pane" prefHeight="20.0" prefWidth="600.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
                <children>
                   <Label fx:id="fileName" prefHeight="18.0" prefWidth="608.0">
                      <font>
@@ -144,5 +147,15 @@
             </Pane>
          </top>
       </BorderPane>
+      <MenuBar layoutY="1.0" prefHeight="26.0" prefWidth="600.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="theme">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#goDark" text="dark" />
+                  <MenuItem mnemonicParsing="false" onAction="#goLight" text="light" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
    </children>
 </AnchorPane>

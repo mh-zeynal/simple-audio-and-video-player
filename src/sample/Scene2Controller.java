@@ -11,10 +11,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import java.io.File;
@@ -45,22 +50,10 @@ public class Scene2Controller {
     @FXML private Slider progressSlider;
     @FXML private Label currentTime;
     @FXML private Label mediaWholeTime;
-    class ReplayThread extends Thread{
-        @Override
-        public void run() {
-            while (true){
-                if (player.getMedia() != null && player != null){
-                    if (player.getMedia().getDuration().toSeconds() == player.getCurrentTime().toSeconds()) {
-                        player.setStartTime(new Duration(0));
-                        break;
-                    }
-                }
-                else if(player.getMedia() == null)
-                    break;
-            }
-        }
-    }
-    private ReplayThread replayThread;
+    @FXML private Pane pane;
+    @FXML private Pane buttonsPane;
+    @FXML private BorderPane borderPane;
+    @FXML private ImageView for10;
     public void initialize(){
         replayKey = false;
         muteKey = false;
@@ -103,7 +96,7 @@ public class Scene2Controller {
         return "" + x;
     }
     @FXML public void play(ActionEvent event){
-        player.setStartTime(duration);
+        player.seek(duration);
         player.play();
         playButton.setVisible(false);
         playButton.setDisable(true);
@@ -123,13 +116,10 @@ public class Scene2Controller {
             replayButton.setStyle("-fx-background-color: #6d1414; -fx-background-radius: 18");
             player.setCycleCount(Timeline.INDEFINITE);
             replayKey = true;
-            replayThread = new ReplayThread();
-            replayThread.start();
         }
         else{
             replayButton.setStyle("-fx-background-color: #0C1F84FF; -fx-background-radius: 18");
             player.setCycleCount(0);
-            replayThread.interrupt();
             replayKey = false;
         }
     }
@@ -157,10 +147,8 @@ public class Scene2Controller {
         file = chooser.showOpenDialog(null);
         fileName.setText(file.getName());
         media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
-        if (replayThread != null) {
-            replayThread.interrupt();
+        if (replayKey)
             player.stop();
-        }
         player = new MediaPlayer(media);
         mediaView.setMediaPlayer(player);
         player.setOnReady(new Runnable() {
@@ -186,11 +174,8 @@ public class Scene2Controller {
         playButton.setDisable(true);
         pauseButton.setVisible(true);
         pauseButton.setDisable(false);
-        if (replayKey){
+        if (replayKey)
             player.setCycleCount(Timeline.INDEFINITE);
-            replayThread = new ReplayThread();
-            replayThread.start();
-        }
     }
     @FXML public void loadFileKeyBoard(KeyEvent event){
         KeyCodeCombination keyCodeCombination = new KeyCodeCombination(KeyCode.F,
@@ -201,10 +186,8 @@ public class Scene2Controller {
             file = chooser.showOpenDialog(null);
             fileName.setText(file.getName());
             media = new Media(Paths.get(file.getAbsolutePath()).toUri().toString());
-            if (replayThread != null) {
-                replayThread.interrupt();
+            if (replayKey)
                 player.stop();
-            }
             player = new MediaPlayer(media);
             mediaView.setMediaPlayer(player);
             player.setOnReady(new Runnable() {
@@ -215,9 +198,7 @@ public class Scene2Controller {
                     progressSlider.setValue(0);
                     progressSlider.setBlockIncrement(1);
                     player.setVolume(0.5);
-                    String temp = getTime((int) media.getDuration().toSeconds());
-                    mediaWholeTime.setText(temp);
-                    System.out.println(temp);
+                    mediaWholeTime.setText(getTime((int) media.getDuration().toSeconds()));
                     player.currentTimeProperty().addListener(new InvalidationListener() {
                         @Override
                         public void invalidated(Observable observable) {
@@ -225,6 +206,7 @@ public class Scene2Controller {
                             currentTime.setText(getTime((int) player.getCurrentTime().toSeconds()));
                         }
                     });
+
                 }
             });
             player.play();
@@ -232,11 +214,8 @@ public class Scene2Controller {
             playButton.setDisable(true);
             pauseButton.setVisible(true);
             pauseButton.setDisable(false);
-            if (replayKey){
+            if (replayKey)
                 player.setCycleCount(Timeline.INDEFINITE);
-                replayThread = new ReplayThread();
-                replayThread.start();
-            }
         }
     }
     @FXML public void for10(ActionEvent event){
@@ -275,15 +254,27 @@ public class Scene2Controller {
             }
         });
     }
+    @FXML public void goDark(ActionEvent event){
+        currentTime.setTextFill(Color.WHITE);
+        mediaWholeTime.setTextFill(Color.WHITE);
+        borderPane.setStyle("-fx-background-color: #383636");
+        pane.setStyle("-fx-background-color: black");
+        buttonsPane.setStyle("-fx-background-color: black");
+        volumeValue.setTextFill(Color.WHITE);
+    }
+    @FXML public void goLight(ActionEvent event){
+        currentTime.setTextFill(Color.BLACK);
+        mediaWholeTime.setTextFill(Color.BLACK);
+        borderPane.setStyle("-fx-background-color: #939191");
+        pane.setStyle("-fx-background-color: white");
+        buttonsPane.setStyle("-fx-background-color: white");
+        volumeValue.setTextFill(Color.BLACK);
+    }
     @FXML public void setProgress(){
-        progressSlider.valueProperty().addListener(new InvalidationListener() {
+        progressSlider.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
-            public void invalidated(Observable observable) {
-                if (progressSlider.isValueChanging()) {
-                    player.setStartTime(new Duration(progressSlider.getValue()));
-                    player.play();
-                    System.out.println(progressSlider.getValue());
-                }
+            public void handle(MouseEvent event) {
+                player.seek(new Duration(progressSlider.getValue()));
             }
         });
     }
